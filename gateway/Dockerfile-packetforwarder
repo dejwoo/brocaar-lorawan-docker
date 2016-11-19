@@ -1,0 +1,34 @@
+FROM resin/rpi-raspbian:latest
+RUN apt-get -y update
+RUN apt-get -y install \
+	gcc \
+	git \
+	golang \
+	make \
+	mosquitto
+
+#packet forwarder for imst iC880A
+WORKDIR /opt
+
+##  driver / hardware abstraction layer source
+RUN git clone https://github.com/Lora-net/lora_gateway.git
+
+## the packet_forwarder source
+RUN git clone https://github.com/Lora-net/packet_forwarder.git
+
+## repo with systemd rule
+RUN git clone https://github.com/dejwoo/systemctl-packetforwarder
+
+## build driver/HAL
+WORKDIR /opt/lora_gateway
+RUN make all
+
+## build packet_forwarder
+WORKDIR /opt/packet_forwarder
+RUN make all
+
+## run script to create packet_forwarder user and place systemd rule
+WORKDIR /opt/systemctl-packetforwarder
+RUN ./install.sh
+
+EXPOSE 1680
