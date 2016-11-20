@@ -25,11 +25,9 @@ RUN make all
 
 ## build packet_forwarder
 WORKDIR /opt/packet_forwarder
+COPY ./set_config.sh /opt/packet_forwarder/
 RUN make all
-
-## run script to create packet_forwarder user and place systemd rule
-WORKDIR /opt/systemctl-packetforwarder
-RUN chmod u+x ./install.sh
+## set enviroment variables
 # 44454641554c5430 -> DEFAULT0
 ENV PACKET_FORWARDER_GATEWAY_ID=44454641554c5430
 ENV PACKET_FORWARDER_SERVER_ADDRESS=0.0.0.0
@@ -41,7 +39,10 @@ ENV PACKET_FORWARDER_PUSH_TIMEOUT_MS=100
 ENV PACKET_FORWARDER_FORWARD_CRC_VALID=true
 ENV PACKET_FORWARDER_FORWARD_CRC_ERROR=false
 ENV PACKET_FORWARDER_FORWARD_CRC_DISABLED=false
-RUN ./install.sh
+RUN ./set_config.sh
 
 EXPOSE $PACKET_FORWARDER_SERV_PORT_UP
 EXPOSE $PACKET_FORWARDER_SERV_PORT_DOWN
+
+CMD ["/opt/packet_forwarder/lora_pkt_fwd/lora_pkt_fwd"]
+
