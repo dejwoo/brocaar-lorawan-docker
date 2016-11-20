@@ -2,8 +2,8 @@ FROM resin/rpi-raspbian:latest
 RUN apt-get -y update
 RUN apt-get -y install \
 	gcc \
+	build-essential \
 	git \
-	golang \
 	make \
 	mosquitto
 
@@ -29,6 +29,7 @@ RUN make all
 
 ## run script to create packet_forwarder user and place systemd rule
 WORKDIR /opt/systemctl-packetforwarder
+RUN chmod u+x ./install.sh
 RUN ./install.sh
 
 EXPOSE 1680
